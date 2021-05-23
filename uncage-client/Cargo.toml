@@ -1,0 +1,25 @@
+[package]
+name = "uncage-client"
+version = "0.1.0"
+authors = ["eater <=@eater.me>"]
+edition = "2018"
+
+[dependencies]
+tokio = { version = "1.6.0", features = ["full"] }
+tonic = "0.4.3"
+tower = "0.4.7"
+tonic-openssl = "0.1.0"
+prost = "0.7.0"
+hyper = "0.14.7"
+bytes = "1.0.1"
+hyper-openssl = "0.9.1"
+
+
+[build-dependencies]
+tonic-build = "0.4.2"
+
+[target.'cfg(windows)'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[target.'cfg(not(windows))'.dependencies]
+openssl = "0.10"

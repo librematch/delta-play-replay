@@ -1,0 +1,674 @@
+syntax = "proto3";
+
+package cade_api.rpc;
+
+option cc_enable_arenas = true;
+option optimize_for = SPEED;
+
+service CadeRemote {
+    rpc Info(InfoRequest) returns (InfoResponse);
+    rpc Pause(PauseRequest) returns (PauseResponse);
+    rpc SetFogOfWar(SetFogOfWarRequest) returns (SetFogOfWarResponse);
+    rpc SetPerspective(SetPerspectiveRequest) returns (SetPerspectiveResponse);
+    rpc Frames(FramesRequest) returns (stream FrameSequence);
+}
+
+message InfoRequest {
+    
+}
+
+message InfoResponse {
+    uint32 gameVersion = 1;
+    uint32 apiVersion = 2;
+    string baseDirectory = 3;
+    repeated string enabledModDirectories = 4;
+}
+
+message PauseRequest {
+    bool paused = 1;
+}
+
+message PauseResponse {
+    bool success = 1;
+    bool changed = 2;
+}
+
+message SetFogOfWarRequest {
+    bool fogOfWar = 1;
+}
+
+message SetFogOfWarResponse {
+    bool success = 1;
+    bool changed = 2;
+}
+
+message SetPerspectiveRequest {
+    int32 playerId = 1;
+}
+
+message SetPerspectiveResponse {
+    bool success = 1;
+    int32 playerId = 2;
+}
+
+message FramesRequest {
+    repeated ResolutionEntry desiredResolutions = 1;
+    message ResolutionEntry {
+        Category key = 1;
+        enum Category {
+            TIME_STEP = 0;
+            LOW_PRIORITY = 1;
+            SLEEPING_UNIT = 2;
+            PARTICLES = 3;
+            GAME_OPTIONS = 4;
+            PARTICLES_SIMULATION_OUTPUT = 5;
+        }
+        
+        int32 gameTimeResolution = 2;
+    }
+    
+    bool disableCommands = 2;
+    bool disableParticles = 3;
+    repeated string particleDefinitionWhitelist = 4;
+    bool disableParticleCulling = 5;
+}
+
+message FrameSequence {
+    repeated Frame frame = 1;
+    uint32 sendingWorldTime = 2;
+    uint32 numberOfFramesQueued = 3;
+}
+
+message Frame {
+    uint32 time = 1;
+    bytes patch = 2;
+    repeated Event event = 3;
+    bytes reversePatch = 4;
+    uint32 timeStepsSkipped = 7;
+    
+    repeated MetricEntry metrics = 5;
+    message MetricEntry {
+        Region key = 1;
+        enum Region {
+            ALL = 0;
+            ENTITIES = 1;
+            SLEEPING_ENTITIES = 2;
+            MAP_TILES = 3;
+            UNIFIED_VISIBLE_MAP = 4;
+            PARTICLES = 5;
+            MASTER_ENTITIES = 6;
+            RESEARCH_STATES = 7;
+            VICTORY_POINTS = 8;
+            APPLY_PATCH = 9;
+            GAME_OPTIONS = 10;
+        }
+        
+        uint32 timeMeasured = 2;
+        uint32 count = 3;
+    }
+    
+    repeated Command command = 6;
+}
+
+message Event {
+    oneof event {
+        EntityKilled entityKilled = 1;
+        MarketTransaction marketTransaction = 2;
+        Tribute tribute = 3;
+        PlayerChat playerChat = 4;
+        CombatNotificationSound combatNotificationSound = 5;
+    }
+    
+    message EntityKilled {
+        int32 id = 1;
+        int32 killerId = 2;
+    }
+    
+    message MarketTransaction {
+        uint32 playerId = 1;
+        uint32 attributeType = 2;
+        float attributeBefore = 3;
+        float goldBefore = 4;
+        float attributeExchanged = 5;
+        float goldRate = 6;
+        float goldExchanged = 7;
+    }
+    
+    message Tribute {
+        uint32 senderId = 1;
+        uint32 receiverId = 2;
+        uint32 attributeType = 3;
+        float senderValueBefore = 4;
+        float senderValueChange = 5;
+        float receiverValueBefore = 6;
+        float receiverValueChange = 7;
+    }
+    
+    message PlayerChat {
+        int32 playerId = 1;
+        int32 commPlayerId = 2;
+        
+        Channel channel = 3;
+        enum Channel {
+            Default = 0;
+            AllChat = 1;
+            TeamChat = 2;
+            EnemyChat = 3;
+        }
+        
+        string text = 4;
+        int32 taunt = 5;
+    }
+    
+    message CombatNotificationSound {
+        int32 receiverId = 1;
+        
+        Type type = 2;
+        enum Type {
+            Normal = 0;
+            Wolf = 1;
+            Town = 2;
+        }
+        
+        int32 attackedObjectId = 3;
+    }
+}
+
+message Command {
+    oneof command {
+        Interact interact = 1000;
+        Stop stop = 1001;
+        Work work = 1002;
+        Move move = 1003;
+        Create create = 1004;
+        AddAttribute addAttribute = 1005;
+        AiOrder aiOrder = 1010;
+        Resign resign = 1011;
+        AddWaypoint addWaypoint = 112;
+        Pause pause = 1013;
+        GroupWaypoint groupWaypoint = 1016;
+        GroupAiOrder groupAiOrder = 1017;
+        UnitAiState unitAiState = 1018;
+        Guard guard = 1019;
+        Follow follow = 1020;
+        Patrol patrol = 1021;
+        Scout scout = 1022;
+        FormFormation formFormation = 1023;
+        MultiplayerSave multiplayerSave = 1027;
+        GroupMultiWaypoints groupMultiWaypoints = 1031;
+        Chapter chapter = 1032;
+        AttackMove attackMove = 1033;
+        AttackMoveTarget attackMoveTarget = 1034;
+        Retreat retreat = 1035;
+        UnitTypeAiState unitTypeAiState = 1037;
+        AutoScout autoScout = 1038;
+        StopAll stopAll = 1039;
+        MoreTechs moreTechs = 1040;
+        TransformObject transformObject = 1041;
+        Make make = 1100;
+        Research research = 1101;
+        Build build = 1102;
+        Game game = 1103;
+        Explore explore = 1104;
+        BuildWall buildWall = 1105;
+        CancelBuild cancelBuild = 1106;
+        AttackGround attackGround = 1107;
+        GiveAttribute2 giveAttribute2 = 1108;
+        TradeAttribute tradeAttribute = 1109;
+        Repair repair = 1110;
+        Unload unload = 1111;
+        Gate gate = 1114;
+        Flare flare = 1115;
+        UnitOrder unitOrder = 1117;
+        Diplomacy diplomacy = 1118;
+        Queue queue = 1119;
+        SetGatherPoint setGatherPoint = 1120;
+        SellCommodity sellCommodity = 1122;
+        BuyCommodity buyCommodity = 1123;
+        UnitTransform unitTransform = 1125;
+        DropRelic dropRelic = 1126;
+        TownBell townBell = 1127;
+        GoBackToWork goBackToWork = 1128;
+        MultiQueue multiQueue = 1129;
+        SetGatherState setGatherState = 1130;
+        DeleteObjects deleteObjects = 1131;
+        ResetBuildings resetBuildings = 1132;
+        MultiGate multiGate = 1133;
+        GoBackToWork2 goBackToWork2 = 1134;
+        ChangePlayerName changePlayerName = 1135;
+        UnknownCommand unknownCommand = 2000;
+    }
+    
+    message XyzUintPoint {
+        uint32 x = 1;
+        uint32 y = 2;
+        uint32 z = 3;
+    }
+    
+    message XyzFloatPoint {
+        float x = 1;
+        float y = 2;
+        float z = 3;
+    }
+    
+    message XyUintPoint {
+        uint32 x = 1;
+        uint32 y = 2;
+    }
+    
+    message XyFloatPoint {
+        float x = 1;
+        float y = 2;
+    }
+    
+    message Interact {
+        uint32 commPlayerId = 1;
+        int32 targetId = 2;
+        XyFloatPoint location = 4;
+        bool extend = 5;
+        bool instant = 6;
+        bool humanOrder = 7;
+        bool controlHeld = 8;
+        repeated int32 unitIds = 9;
+    }
+    
+    message Stop {
+        repeated int32 unitIds = 2;
+    }
+    
+    message Work {
+        uint32 commPlayerId = 1;
+        int32 targetId = 2;
+        XyFloatPoint location = 4;
+        bool extend = 5;
+        bool instant = 6;
+        bool humanOrder = 7;
+        bool controlHeld = 8;
+        repeated int32 unitIds = 9;
+    }
+    
+    message Move {
+        uint32 commPlayerId = 1;
+        int32 targetId = 2;
+        XyFloatPoint location = 4;
+        bool extend = 5;
+        bool instant = 6;
+        bool humanOrder = 7;
+        bool controlHeld = 8;
+        repeated int32 unitIds = 9;
+    }
+    
+    message Create {
+        int32 objCategory = 1;
+        uint32 playerId = 2;
+        XyzFloatPoint location = 3;
+    }
+    
+    message AddAttribute {
+        uint32 playerId = 1;
+        uint32 attrId = 2;
+        float attrAmount = 3;
+    }
+    
+    message AiOrder {
+        uint32 playerId = 2;
+        uint32 issuer = 3;
+        int32 recipient = 4;
+        int32 orderType = 5;
+        uint32 orderPriority = 6;
+        uint32 targetOwner = 8;
+        XyzFloatPoint location = 9;
+        float range = 10;
+        bool immediate = 11;
+        bool inFront = 12;
+        repeated int32 unitIds = 13;
+    }
+    
+    message Resign {
+        uint32 playerId = 1;
+        uint32 commPlayerId = 2;
+        bool dropped = 3;
+    }
+    
+    message AddWaypoint {
+        uint32 playerId = 1;
+        int32 recipient = 2;
+        repeated XyzUintPoint waypoints = 4;
+    }
+    
+    message Pause {
+        repeated int32 unitIds = 2;
+    }
+    
+    message GroupWaypoint {
+        uint32 commPlayerId = 1;
+        XyUintPoint location = 3;
+        repeated int32 unitIds = 4;
+    }
+    
+    message GroupAiOrder {
+        uint32 playerId = 1;
+        uint32 issuer = 2;
+        int32 orderType = 4;
+        uint32 orderPriority = 5;
+        int32 targetId = 6;
+        uint32 targetOwner = 7;
+        XyzFloatPoint location = 8;
+        float range = 9;
+        bool immediate = 10;
+        bool inFront = 11;
+        repeated int32 unitIds = 12;
+    }
+    
+    message UnitAiState {
+        uint32 state = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message UnitTypeAiState {
+        uint32 state = 2;
+        int32 unitType = 3;
+        int32 playerId = 4;
+    }
+    
+    message Guard {
+        int32 targetId = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message Follow {
+        int32 targetId = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message Patrol {
+        bool reset = 3;
+        repeated XyFloatPoint wayPoints = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message Scout {
+        XyFloatPoint location = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message FormFormation {
+        uint32 playerId = 2;
+        int32 formationType = 3;
+        repeated int32 unitIds = 4;
+    }
+    
+    message MultiplayerSave {
+        bool exitAfterSave = 1;
+        uint32 commPlayer = 2;
+    }
+    
+    message GroupMultiWaypoints {
+        repeated int32 unitIds = 3;
+        repeated XyUintPoint waypoints = 4;
+    }
+    
+    message Chapter {
+        uint32 commPlayerId = 1;
+    }
+    
+    message AttackMove {
+        bool reset = 3;
+        repeated XyFloatPoint waypoints = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message AttackMoveTarget {
+        int32 targetId = 2;
+        repeated XyFloatPoint waypoints = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message Retreat {
+        uint32 commPlayerId = 1;
+        int32 targetId = 2;
+        XyFloatPoint location = 4;
+        bool extend = 5;
+        bool instant = 6;
+        bool humanOrder = 7;
+        bool controlHeld = 8;
+        repeated int32 unitIds = 9;
+    }
+    
+    message AutoScout {
+        repeated int32 unitIds = 2;
+    }
+    
+    message StopAll {
+        uint32 playerID = 1;
+    }
+    
+    message MoreTechs {
+        uint32 playerID = 1;
+    }
+    
+    message TransformObject {
+        uint32 playerID = 1;
+        int32 masterId = 2;
+        int32 objId = 3;
+    }
+    
+    message Make {
+        int32 unitId = 1;
+        uint32 unitPlayerId = 2;
+        int32 objId = 3;
+        int32 uniqueId = 4;
+    }
+    
+    message Research {
+        int32 unitId = 1;
+        uint32 unitPlayerId = 2;
+        int32 techId = 4;
+        int32 uniqueId = 5;
+        bool extend = 6;
+        repeated int32 buildingIds = 7;
+    }
+    
+    message Build {
+        uint32 unitPlayerId = 2;
+        XyFloatPoint location = 3;
+        int32 objId = 4;
+        int32 uniqueId = 5;
+        uint32 frame = 6;
+        bool extend = 7;
+        bool instant = 8;
+        int32 spriteOverrideId = 9;
+        repeated int32 unitIds = 10;
+    }
+    
+    message Game {
+        uint32 gameCommandId = 1;
+        int32 var1 = 2;
+        int32 var2 = 3;
+        float var3 = 4;
+        uint32 var4 = 5;
+    }
+    
+    message Explore {
+        uint32 unitPlayerId = 2;
+        XyFloatPoint location = 3;
+        repeated int32 unitIds = 4;
+    }
+    
+    message BuildWall {
+        uint32 unitPlayerId = 2;
+        XyUintPoint location1 = 3;
+        XyUintPoint location2 = 4;
+        int32 objId = 5;
+        int32 uniqueId = 6;
+        bool extend = 7;
+        bool instant = 8;
+        repeated int32 unitIds = 9;
+    }
+    
+    message CancelBuild {
+        int32 unitId = 1;
+        int32 unitPlayerId = 2;
+    }
+    
+    message AttackGround {
+        XyFloatPoint location = 2;
+        bool extend = 3;
+        bool instant = 4;
+        bool humanOrder = 5;
+        repeated int32 unitIds = 6;
+    }
+    
+    message GiveAttribute2 {
+        uint32 playerId = 1;
+        uint32 toPlayerId = 2;
+        uint32 attrId = 3;
+        float attrAmount = 4;
+        float attrCost = 5;
+    }
+    
+    message TradeAttribute {
+        int32 attribute = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message Repair {
+        int32 targetId = 2;
+        bool extend = 3;
+        bool instant = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message Unload {
+        XyFloatPoint location = 2;
+        uint32 unloadFlag = 3;
+        int32 unloadUnitType = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message Gate {
+        int32 unitId = 1;
+    }
+    
+    message Flare {
+        int32 unitId = 1;
+        bytes flareFlags = 2;
+        XyFloatPoint location = 3;
+        uint32 playerId = 4;
+        uint32 commPlayerId = 5;
+    }
+    
+    message UnitOrder {
+        int32 targetId = 2;
+        uint32 action = 3;
+        uint32 param = 4;
+        XyFloatPoint location = 5;
+        int32 unique_id = 6;
+        bool extend = 7;
+        bool instant = 8;
+        bool humanOrder = 9;
+        repeated int32 unitIds = 10;
+    }
+    
+    message Diplomacy {
+        uint32 playerId1 = 1;
+        uint32 playerId2 = 2;
+        uint32 sequence = 3;
+        uint32 status = 4;
+        uint32 declare = 5;
+        uint32 diplomacy = 6;
+        uint32 intelligence = 7;
+        uint32 trade = 8;
+        uint32 demand = 9;
+        int32 gold = 10;
+        string message = 11;
+    }
+    
+    message Queue {
+        int32 buildingId = 1;
+        int32 trainId = 2;
+        int32 trainCount = 3;
+    }
+    
+    message SetGatherPoint {
+        int32 targetId = 2;
+        int32 targetMasterId = 3;
+        XyFloatPoint location = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message SellCommodity {
+        uint32 playerId = 1;
+        uint32 attrId = 2;
+        uint32 lotCount = 3;
+        int32 unitId = 4;
+    }
+    
+    message BuyCommodity {
+        uint32 playerId = 1;
+        uint32 attrId = 2;
+        uint32 lotCount = 3;
+        int32 unitId = 4;
+    }
+    
+    message UnitTransform {
+        uint32 unitPlayerId = 2;
+        int32 objId = 3;
+        int32 uniqueId = 4;
+        repeated int32 unitIds = 5;
+    }
+    
+    message DropRelic {
+        int32 unitId = 1;
+    }
+    
+    message TownBell {
+        int32 unitId = 1;
+        uint32 activateFlag = 2;
+    }
+    
+    message GoBackToWork {
+        int32 unitId = 1;
+    }
+    
+    message MultiQueue {
+        uint32 playerId = 1;
+        int32 selectedBuildingId = 2;
+        int32 trainId = 4;
+        int32 trainCount = 5;
+        repeated int32 buildingIds = 6;
+    }
+    
+    message SetGatherState {
+        uint32 state = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message DeleteObjects {
+        uint32 playerId = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message ResetBuildings {
+        uint32 state = 2;
+        repeated int32 unitIds = 3;
+    }
+    
+    message MultiGate {
+        uint32 state = 1;
+        repeated int32 unitIds = 3;
+    }
+    
+    message GoBackToWork2 {
+        repeated int32 unitIds = 2;
+    }
+    
+    message ChangePlayerName {
+        uint32 playerId = 1;
+        string newName = 2;
+    }
+    
+    message UnknownCommand {
+        uint32 commandId = 1;
+    }
+}
