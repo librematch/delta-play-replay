@@ -1,4 +1,12 @@
+use crate::pb::cade_remote_client::CadeRemoteClient;
+use crate::pb::FramesRequest;
+use hyper::client::HttpConnector;
+use hyper::Uri;
+use hyper_openssl::HttpsConnector;
+use openssl::ssl::{SslConnector, SslMethod};
+use openssl::x509::X509;
 use std::env::args;
+use tonic_openssl::ALPN_H2_WIRE;
 
 pub mod pb {
     include!(concat!(env!("OUT_DIR"), "/cade_api.rpc.rs"));
@@ -9,7 +17,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server_root_ca_cert = include_bytes!("../cert/certificate-authority.pem");
     let client_cert = include_bytes!("../cert/cade-client.pem");
     let client_key = include_bytes!("../cert/cade-client.key");
-
 
     let ca = X509::from_pem(server_root_ca_cert)?;
 
@@ -69,7 +76,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     while let Some(seq) = response.get_mut().message().await? {
         tokio::fs::write("single-patch.bin", &seq.frame[0].patch).await?;
     }
-
 
     println!("RESPONSE={:#?}", response);
 
