@@ -1,5 +1,7 @@
 [workspace]
 members = [
     "uncage-client",
-    "uncage-patcher"
+    "uncage-patcher",
+    "uncage-model",
+    "uncage-model-proc-macro"
 ]

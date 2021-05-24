@@ -1,7 +1,12 @@
+mod model;
+
 #[cfg(test)]
 mod tests {
+    use crate::model;
+    use uncage_model::Document;
+
     #[test]
     fn it_works() {
-        assert_eq!(2 + 2, 4);
+        let doc: Document<model::Root> = Document::new();
     }
 }
