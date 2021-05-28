@@ -1,3 +1,14 @@
+[package]
+name = "uncage"
+version = "0.1.0"
+authors = ["eater <=@eater.me>"]
+edition = "2018"
+
+[dependencies]
+uncage-client = { path = "uncage-client" }
+uncage-model = { path = "uncage-model" }
+uncage-patcher = { path = "uncage-patcher" }
+
 [workspace]
 members = [
     "uncage-client",

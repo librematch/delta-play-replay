@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 uncage-model-proc-macro = { path = "../uncage-model-proc-macro" }
 bytes = "1.0.1"
+anyhow = "1.0.40"
+serde_json = { version = "1.0.64", features = ["preserve_order"] }

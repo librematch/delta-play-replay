@@ -1,12 +1,16 @@
 use crate::pb::cade_remote_client::CadeRemoteClient;
 use crate::pb::FramesRequest;
 use hyper::client::HttpConnector;
-use hyper::Uri;
+use hyper::{Client, Uri};
 use hyper_openssl::HttpsConnector;
+use openssl::pkey::PKey;
 use openssl::ssl::{SslConnector, SslMethod};
 use openssl::x509::X509;
-use std::env::args;
+use std::fs::File;
 use tonic_openssl::ALPN_H2_WIRE;
+
+pub use prost::{self, Message};
+use std::io::Write;
 
 pub mod pb {
     include!(concat!(env!("OUT_DIR"), "/cade_api.rpc.rs"));
@@ -73,11 +77,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     });
 
     let mut response: tonic::Response<tonic::Streaming<_>> = client.frames(request).await?;
+    let mut frames = 0;
+    let mut events = 0;
+    let mut commands = 0;
+    let mut sequences = 0;
+
+    let output = File::open("output.xz")?;
+
+    let mut compressor = xz2::write::XzEncoder::new(output, 9);
+
+    let mut bytes = Vec::with_capacity(10 * 1024 * 1024);
     while let Some(seq) = response.get_mut().message().await? {
-        tokio::fs::write("single-patch.bin", &seq.frame[0].patch).await?;
+        bytes.clear();
+        frames += seq.frame.len();
+
+        for frame in &seq.frame {
+            events += frame.event.len();
+            commands += frame.command.len();
+        }
+
+        Message::encode_length_delimited(&seq, &mut bytes)?;
+        compressor
+            .write_all(&bytes)
+            .expect("Failed to write to compressor");
+        sequences += 1usize;
     }
 
-    println!("RESPONSE={:#?}", response);
+    println!(
+        "Dumped {} frames (over {} sequences, containing {} events, and {} commands)",
+        frames, sequences, events, commands
+    );
 
     Ok(())
 }
