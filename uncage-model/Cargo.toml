@@ -10,4 +10,6 @@ edition = "2018"
 uncage-model-proc-macro = { path = "../uncage-model-proc-macro" }
 bytes = "1.0.1"
 anyhow = "1.0.40"
+num-traits = "0.2.14"
+num-derive = "0.3.3"
 serde_json = { version = "1.0.64", features = ["preserve_order"] }

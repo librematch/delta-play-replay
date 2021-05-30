@@ -1,5 +1,5 @@
 use darling::{FromDeriveInput, FromField};
-use heck::ShoutySnakeCase;
+use heck::{ShoutySnakeCase, CamelCase};
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use syn::{parse_macro_input, AngleBracketedGenericArguments, PathArguments, Type};
@@ -53,6 +53,11 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
 
     let mut list_remove = vec![];
 
+    let model_fields_enum_str = model_name.to_string() + "Fields";
+    let model_fields_enum = syn::Ident::new(&model_fields_enum_str, proc_macro2::Span::call_site());
+    let mut model_fields_enum_names = vec![];
+
+    let mut has_fields = false;
     for field in data {
         if field.extends {
             extension_field_ident = Some(field.ident.as_ref().unwrap().clone());
@@ -60,8 +65,14 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
             continue;
         }
 
+        has_fields = true;
+
         let field_ident = field.ident.as_ref().unwrap();
         let field_name = field_ident.to_string();
+        let field_name = field_name.replace("r#", "");
+
+        let field_type_ident = syn::Ident::new(&field_name.to_camel_case(), proc_macro2::Span::call_site());
+
         let field_index = field.index;
         let field_autofill = field.autofill;
         let field_local_type = LocalType::parse(&field.ty);
@@ -86,6 +97,8 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 autofill: #field_autofill,
             }
         });
+
+        model_fields_enum_names.push(field_type_ident);
 
         indexes.push(i);
         field_indexes.push(field.index);
@@ -240,7 +253,6 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
     };
 
 
-
     // let create_map_field = if let Some(extension) = &extension_field_ident {
     //     quote::quote! {
     //         index => self.#extension.create_map_field(index, key)
@@ -283,6 +295,36 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
     let remove_list_field = fallthrough_to_extension("remove_list_field", "No list on field {}", &["field", "index"]);
     let swap_list_field = fallthrough_to_extension("swap_list_field", "No list on field {}", &["field", "lhs", "rhs"]);
 
+    let fields_enum = if has_fields {
+        quote::quote! {
+            #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+            #[repr(usize)]
+            pub enum #model_fields_enum {
+                #(#model_fields_enum_names = #field_indexes),*
+            }
+
+            impl ::uncage_model::Fields for #model_fields_enum {
+                fn field(&self) -> usize {
+                    *self as usize
+                }
+
+                fn model(&self) -> usize {
+                    #model_ident::const_model_type()
+                }
+            }
+        }
+    } else {
+        quote::quote! {}
+    };
+
+    let get_parent = if let Some(extension) = &extension_field_ident {
+        quote::quote! {
+            Some(&self.#extension)
+        }
+    } else {
+        quote::quote! { None }
+    };
+
     (quote::quote! {
         impl #model_ident {
             pub const fn const_model_type() -> usize {
@@ -298,6 +340,8 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
             }
         }
 
+        #fields_enum
+
         const #model_fields_const_ident: [::uncage_model::FieldDescription; #i] = [#(#field_definitions),*];
 
         impl ::uncage_model::Model for #model_ident {
@@ -311,6 +355,14 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
         }
 
         impl ::uncage_model::ModelDescription for #model_ident {
+            fn as_any(&self) -> &dyn ::std::any::Any {
+                self as &dyn ::std::any::Any
+            }
+
+            fn get_parent(&self) -> Option<&dyn ::uncage_model::ModelDescription> {
+                #get_parent
+            }
+
             fn get_model_type(&self) -> usize {
                 #model_ident::const_model_type()
             }

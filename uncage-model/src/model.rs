@@ -11,7 +11,11 @@ pub trait ModelCollection: Debug {
     fn boxed(self) -> Box<dyn ModelDescription>;
 }
 
-pub trait ModelDescription: Debug + 'static {
+pub trait ModelDescription: Debug + Any + 'static {
+    fn as_any(&self) -> &dyn Any;
+
+    fn get_parent(&self) -> Option<&dyn ModelDescription>;
+
     fn get_model_type(&self) -> usize;
     fn get_model_name(&self) -> &'static str;
     fn get_fields(&self) -> Vec<FieldDescription>;
@@ -47,6 +51,30 @@ pub trait ModelDescription: Debug + 'static {
     fn insert_list_field_ref(&mut self, field: usize, index: usize) -> &mut Ref;
 }
 
+impl dyn ModelDescription {
+    pub fn downcast_ref<T: Model>(&self) -> Option<&T> {
+        self.as_any().downcast_ref::<T>()
+    }
+
+    pub fn cast_ref<T: Model>(&self) -> Option<&T> {
+        self.as_any()
+            .downcast_ref::<T>()
+            .or_else(|| self.get_parent().and_then(|x| x.cast_ref::<T>()))
+    }
+
+    pub fn is<T: Model>(&self) -> bool {
+        self.as_any().is::<T>()
+    }
+
+    pub fn has<T: Model>(&self) -> bool {
+        if self.as_any().is::<T>() {
+            return true;
+        }
+
+        self.get_parent().map(|x| x.has::<T>()).unwrap_or(false)
+    }
+}
+
 pub trait ModelExt: Sized {
     fn assign<B: Buf>(&mut self, index: usize, from: &mut B) -> anyhow::Result<()>;
     fn reset<B: Buf>(&mut self, index: usize) -> anyhow::Result<()>;
@@ -68,6 +96,11 @@ pub struct FieldDescription {
     pub model_name: &'static str,
     pub field_name: &'static str,
     pub autofill: bool,
+}
+
+pub trait Fields {
+    fn field(&self) -> usize;
+    fn model(&self) -> usize;
 }
 
 impl FieldDescription {
@@ -234,7 +267,7 @@ impl FieldType {
     }
 }
 
-pub trait Model: Debug + Default + ModelDescription {
+pub trait Model: Debug + Default + ModelDescription + Any {
     fn model_type() -> usize;
     fn model_name() -> &'static str;
 }

@@ -45,17 +45,23 @@ struct ModelHolder {
 
 pub struct ModelBorrow<'a, R: Model, C: ModelCollection> {
     document: &'a Document<R, C>,
+    id: usize,
     model: ModelRc,
 }
 
 pub struct ModelBorrowOwned<R: Model, C: ModelCollection> {
     document: Document<R, C>,
+    id: usize,
     model: ModelRc,
 }
 
 impl<R: Model, C: ModelCollection> ModelWithDocument<R, C> for ModelBorrowOwned<R, C> {
     fn document(&self) -> &Document<R, C> {
         &self.document
+    }
+
+    fn object(&self) -> usize {
+        self.id
     }
 
     fn model(&self) -> &ModelRc {
@@ -68,6 +74,10 @@ impl<'a, R: Model, C: ModelCollection> ModelWithDocument<R, C> for ModelBorrow<'
         self.document
     }
 
+    fn object(&self) -> usize {
+        self.id
+    }
+
     fn model(&self) -> &ModelRc {
         &self.model
     }
@@ -75,13 +85,27 @@ impl<'a, R: Model, C: ModelCollection> ModelWithDocument<R, C> for ModelBorrow<'
 
 pub trait ModelWithDocument<R: Model, C: ModelCollection> {
     fn document(&self) -> &Document<R, C>;
+    fn object(&self) -> usize;
     fn model(&self) -> &ModelRc;
 
     fn owned(&self) -> ModelBorrowOwned<R, C> {
         ModelBorrowOwned {
             document: Document::clone(self.document()),
+            id: self.object(),
             model: self.model().clone(),
         }
+    }
+
+    fn is<T: Model>(&self) -> bool {
+        self.model().get().is::<T>()
+    }
+
+    fn downcast_ref<T: Model>(&self) -> Option<&T> {
+        self.model().get().downcast_ref::<T>()
+    }
+
+    fn cast_ref<T: Model>(&self) -> Option<&T> {
+        self.model().get().cast_ref::<T>()
     }
 
     #[must_use = "After reseting a field a model id is returned that should be cleaned up"]
@@ -317,6 +341,7 @@ impl<R: Model, C: ModelCollection> Document<R, C> {
     pub fn by_id(&self, id: usize) -> Option<ModelBorrow<'_, R, C>> {
         self.get().by_id(id).map(|model| ModelBorrow {
             document: self,
+            id,
             model,
         })
     }
@@ -482,6 +507,10 @@ impl<R: Model, C: ModelCollection> Document<R, C> {
 
         id
     }
+
+    pub fn flush(&self) {
+        self.get_mut().flush()
+    }
 }
 
 #[derive(Debug)]
@@ -545,6 +574,7 @@ struct InnerDocument<R: Model, C: ModelCollection> {
     id: usize,
     models: ItemStore<ModelHolder>,
     root: ModelRef<R>,
+    remove_queue: Vec<usize>,
     _pb: PhantomData<C>,
 }
 
@@ -554,6 +584,7 @@ impl<R: Model, C: ModelCollection> InnerDocument<R, C> {
             id: 0,
             models: Default::default(),
             root: ModelRef::empty(),
+            remove_queue: vec![],
             _pb: Default::default(),
         };
 
@@ -580,6 +611,12 @@ impl<R: Model, C: ModelCollection> InnerDocument<R, C> {
     }
 
     pub fn remove(&mut self, id: usize) {
-        self.models.remove(id);
+        self.remove_queue.push(id);
+    }
+
+    pub fn flush(&mut self) {
+        for i in self.remove_queue.drain(..) {
+            self.models.remove(i);
+        }
     }
 }

@@ -9,6 +9,12 @@ uncage-client = { path = "uncage-client" }
 uncage-model = { path = "uncage-model" }
 uncage-patcher = { path = "uncage-patcher" }
 
+[dev-dependencies]
+cairo-rs = { version = "0.9.1", features = ["svg", "png", "v1_16"] }
+nalgebra = "*"
+nalgebra-glm = "0.12.0"
+pastel = "0.8.0"
+
 [workspace]
 members = [
     "uncage-client",

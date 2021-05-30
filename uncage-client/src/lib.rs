@@ -17,7 +17,7 @@ pub mod pb {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let server_root_ca_cert = include_bytes!("../cert/certificate-authority.pem");
     let client_cert = include_bytes!("../cert/cade-client.pem");
     let client_key = include_bytes!("../cert/cade-client.key");
