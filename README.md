@@ -1,13 +1,12 @@
-# uncage
+# age-replay
 
-A hobby project to communicate with the gRPC api exposed by AoE2DE in replays.
+A hobby project to communicate with the gRPC api exposed by AoE2DE during replays.
 
-If you're seeing this, you did not.
+## Goals
 
-Project consists of multiple parts, with each their own function.
+Create a specification and tooling around a delta-based replay format for AoE2DE,
+that doesn't break each new game engine version.
 
-## `uncage-client`
+## License
 
-Consists 
-
-
+AGPL-3.0-or-later; see [LICENSE](./LICENSE).
