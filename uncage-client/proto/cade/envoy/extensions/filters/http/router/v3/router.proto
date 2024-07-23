@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package envoy.extensions.filters.http.router.v3;
+
+import "envoy/config/accesslog/v3/accesslog.proto";
+import "google/protobuf/wrappers.proto";
+import "udpa/annotations/status.proto";
+import "udpa/annotations/versioning.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/router/v3;routerv3";
+option java_multiple_files = true;
+option java_outer_classname = "RouterProto";
+option java_package = "io.envoyproxy.envoy.extensions.filters.http.router.v3";
+
+message Router {
+    google.protobuf.BoolValue dynamic_stats = 1;
+    bool start_child_span = 2;
+    repeated config.accesslog.v3.AccessLog upstream_log = 3;
+    bool suppress_envoy_headers = 4;
+    repeated string strict_check_headers = 5;
+    bool respect_expected_rq_timeout = 6;
+    bool suppress_grpc_request_failure_code_stats = 7;
+}
