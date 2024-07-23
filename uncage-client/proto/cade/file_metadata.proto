@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package renderer.smx.metadata;
+
+option optimize_for = SPEED;
+
+message FileMetadata {
+    string name = 1;
+    int64 lastModified = 2;
+    int32 version = 3;
+    uint32 fileSize = 4;
+    repeated uint32 frameOffsets = 5;
+    bytes sldFrames = 6;
+    uint32 globalAlpha = 7;
+}
+
+message DirectoryMetadata {
+    string path = 1;
+    repeated FileMetadata files = 2;
+}
+
+message MetadataStore {
+    repeated DirectoryMetadata directories = 1;
+    int32 version = 2;
+}
