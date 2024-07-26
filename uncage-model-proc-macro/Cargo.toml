@@ -9,9 +9,9 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-proc_macro_roids = "0.7.0"
-proc-macro2 = "1.0.27"
-syn = "1.0.72"
-quote = "1.0.9"
 darling = "0.13.0"
 heck = "0.3.2"
+proc-macro2 = "1.0.27"
+proc_macro_roids = "0.7.0"
+quote = "1.0.9"
+syn = "1.0.72"

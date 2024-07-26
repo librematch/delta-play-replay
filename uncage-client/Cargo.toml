@@ -5,14 +5,14 @@ authors = ["eater <=@eater.me>"]
 edition = "2018"
 
 [dependencies]
+bytes = "1.0.1"
+hyper = "0.14.7"
+hyper-openssl = "0.9.1"
+prost = "0.7.0"
 tokio = { version = "1.6.0", features = ["full"] }
 tonic = "0.4.3"
-tower = "0.4.7"
 tonic-openssl = "0.1.0"
-prost = "0.7.0"
-hyper = "0.14.7"
-bytes = "1.0.1"
-hyper-openssl = "0.9.1"
+tower = "0.4.7"
 xz2 = "0.1.6"
 
 [build-dependencies]

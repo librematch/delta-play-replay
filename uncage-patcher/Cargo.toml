@@ -5,9 +5,9 @@ authors = ["eater <=@eater.me>"]
 edition = "2018"
 
 [dependencies]
-uncage-model = { path = "../uncage-model" }
 anyhow = "1.0.40"
 byteorder = "1.4.3"
+uncage-model = { path = "../uncage-model" }
 
 bytes = "1.0.1"
 serde_json = "1.0.64"

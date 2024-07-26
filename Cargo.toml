@@ -17,8 +17,8 @@ pastel = "0.8.0"
 
 [workspace]
 members = [
-    "uncage-client",
-    "uncage-patcher",
-    "uncage-model",
-    "uncage-model-proc-macro"
+  "uncage-client",
+  "uncage-model",
+  "uncage-model-proc-macro",
+  "uncage-patcher",
 ]
