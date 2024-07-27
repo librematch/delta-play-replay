@@ -104,12 +104,12 @@ functionalities, and broader community support.
 
 ## Comparison to Existing Format
 
-| Feature                    | Existing `*.carz` Format | New Delta-Snapshot Format |
-| -------------------------- | ------------------------ | ------------------------- |
-| **Backward Compatibility** | Partial                  | Full                      |
-| **Long-Term Storage**      | Limited                  | Optimized                 |
-| **Instant Navigation**     | Supported                | Supported                 |
-| **Performance**            | ?                        | Optimized                 |
+| Feature                    | `*.carz`  | `*.aoe2rd` |
+| -------------------------- | --------- | ---------- |
+| **Backward Compatibility** | Partial   | Full       |
+| **Long-Term Storage**      | Limited   | Optimized  |
+| **Instant Navigation**     | Supported | Supported  |
+| **Performance**            | ?         | Optimized  |
 
 ## Future Considerations
 

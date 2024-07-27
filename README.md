@@ -1,8 +1,8 @@
-# age-replay
+# aoe2rd (AoE2DE Replay Delta)
 
 A (hobby) project to communicate with the gRPC api exposed by AoE2DE during
-replays and creating a new replay format for Age of Empires II: Definitive
-Edition (AoE2DE).
+replays and creating a new replay format `*.aoe2rd` for Age of Empires II:
+Definitive Edition (AoE2DE).
 
 ## Background
 
@@ -14,14 +14,14 @@ for internal debugging purposes and in-memory use. It is not easily accessible
 to the broader community, and it is not designed to be shared or stored for long
 periods.
 
-The goal is to create a new, standardized replay format that accommodates the
-requirements for efficient storage, improved replay functionalities, and broader
-community support.
+The goal is to create a new, standardized replay format `*.aoe2rd` that
+accommodates the requirements for efficient storage, improved replay
+functionalities, and broader community support.
 
 ## Goals
 
-- create a specification and tooling around a delta-based replay format for
-  AoE2DE, that doesn't break each new game engine version
+- create a specification and tooling around a delta-based replay format
+  `*.aoe2rd` for AoE2DE, that doesn't break each new game engine version
 
 - automate the conversion process of recorded games to this delta-based replay
   format from game engine versions since the release of AoE2DE
