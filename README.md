@@ -42,14 +42,20 @@ functionalities, and broader community support.
 
 - is it viable, to make the delta-based replay format game independent
 
-  - e.g., what if AoE4, AoM:R and AoE3DE would also have a gRPC Api. Should there be a one-fits-all format where the game is a property or should each game have their own standalone formats?
+  - e.g., what if AoE4, AoM:R and AoE3DE would also have a gRPC Api. Should there
+    be a one-fits-all format where the game is a property or should each game have
+    their own standalone formats?
 
 ## Non-goals
 
 - reimplement a desktop tool like CaptureAge
 
 - enable people to cheat by exposing information of live games, our effort is
-  totally focussed on recorded games
+  totally focussed on (stored) recorded games
+
+  - exception: if the franchise would convert into the format server-side and
+    stream it to CaptureAge directly to be able to spectate games without having
+    the game engine running  
 
 ## License
 
