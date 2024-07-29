@@ -1,27 +1,29 @@
-# aoe2rd (AoE2DE Replay Delta)
+# Delta Play Replay
 
-A (hobby) project to communicate with the gRPC api exposed by AoE2DE during
-replays and creating a new replay format `*.aoe2rd` for Age of Empires II:
-Definitive Edition (AoE2DE).
+A (hobby) project to communicate with the gRPC api exposed by e.g. AoE2DE during
+replays and creating a specification and tooling for a new replay format
+`*.dlpr` for Age of Empires II: Definitive Edition (AoE2DE) and other games.
 
 ## Background
 
 The existing CaptureAge (CA) replay system utilizes an internal format
-(`*.carz`) to play recorded games. This format supports backward compatibility
-with older recorded games, allowing them to be replayed without running the
-original AoE2DE simulation. However, the `*.carz` format is primarily designed
-for internal debugging purposes and in-memory use. It is not easily accessible
-to the broader community, and it is not designed to be shared or stored for long
-periods.
+(`*.cars/*.carz`) to play recorded games. This format supports backward
+compatibility with older recorded games, allowing them to be replayed without
+running the original AoE2DE simulation. However, the `*.cars/*.carz` formats are
+currently primarily designed for internal debugging purposes and in-memory use.
+It is not easily accessible to the broader community, and it is not clear if
+it's designed to be shared or stored for long periods.
 
-The goal is to create a new, standardized replay format `*.aoe2rd` that
+The goal is to create a new, standardized replay format `*.dlpr` that
 accommodates the requirements for efficient storage, improved replay
-functionalities, and broader community support.
+functionalities, and broader community support. Or in case, the original formats
+are already designed for long-term storage, to create a specification and
+tooling around it.
 
 ## Goals
 
-- create a specification and tooling around a delta-based replay format
-  `*.aoe2rd` for AoE2DE, that doesn't break each new game engine version
+- create a specification and tooling around a delta-based replay format `*.dlpr`
+  for AoE2DE, that doesn't break each new game engine version
 
 - automate the conversion process of recorded games to this delta-based replay
   format from game engine versions since the release of AoE2DE

@@ -73,6 +73,36 @@ functionalities, and broader community support.
    - Stream delta-patch files to spectators to reduce local processing
      requirements.
 
+7. **Open Source and Community Support**
+   - Make the new replay format open source and freely available to the
+     community.
+   - Encourage contributions and feedback from developers and users to improve
+     the format over time.
+
+8. **Security and Integrity**
+   - Implement encryption and integrity checks to protect replay files from
+     tampering.
+   - Ensure that only authorized users can access and modify replays.
+
+9. **Documentation and Tooling**
+   - Provide comprehensive documentation for developers and users on the new
+     replay format.
+   - Develop tools for managing, converting, and analyzing replays in the new
+     format.
+
+10. **Performance Optimization**
+    - Optimize the replay format for performance, ensuring smooth playback and
+      minimal resource consumption.
+    - Support parallel processing and caching to enhance replay loading speed.
+
+11. **Game Independence**
+    - Evaluate how far the existing delta-snapshot-based replay formats are
+      game-independent.
+    - Consider the possibility of making the delta-snapshot-based replay format
+      game-independent to support other games in the future.
+    - Evaluate the trade-offs between a universal replay format and
+      game-specific formats for future games in the Age of Empires franchise.
+
 ### Non-Functional Requirements
 
 1. **Performance**
@@ -104,12 +134,12 @@ functionalities, and broader community support.
 
 ## Comparison to Existing Format
 
-| Feature                    | `*.carz`  | `*.aoe2rd` |
-| -------------------------- | --------- | ---------- |
-| **Backward Compatibility** | Partial   | Full       |
-| **Long-Term Storage**      | Limited   | Optimized  |
-| **Instant Navigation**     | Supported | Supported  |
-| **Performance**            | ?         | Optimized  |
+| Feature                    | `*.carz`  | `*.dlpr`  |
+| -------------------------- | --------- | --------- |
+| **Backward Compatibility** | Partial   | Full      |
+| **Long-Term Storage**      | Limited   | Optimized |
+| **Instant Navigation**     | Supported | Supported |
+| **Performance**            | ?         | Optimized |
 
 ## Future Considerations
 
