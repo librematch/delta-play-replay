@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const data = fs.readFileSync(__dirname + "/../source/worker.js", "utf-8");
+const data = fs.readFileSync(__dirname + "../uncage-model/docs/worker.js", "utf-8");
 
 const field = /e\[e.([A-Za-z0-9_]+) = (\d+)]/gi;
 
