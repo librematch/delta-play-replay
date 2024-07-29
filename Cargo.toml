@@ -6,6 +6,8 @@ edition = "2021"
 
 [workspace]
 members = [
+  "examples/decompress",
+  "examples/playback",
   "uncage-client",
   "uncage-model",
   "uncage-model-proc-macro",
