@@ -64,7 +64,8 @@ tooling around it.
 ### Prerequisites
 
 - [Rust](https://www.rust-lang.org/tools/install)
-- [protobuf](https://github.com/google/protobuf) for `protoc` compiler (e.g. `scoop install protobuf`)
+- [protobuf](https://github.com/google/protobuf) for `protoc` compiler (e.g.
+  `scoop install protobuf`)
 
 ## License
 

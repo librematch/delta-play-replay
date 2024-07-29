@@ -1,5 +1,5 @@
 use darling::{FromDeriveInput, FromField};
-use heck::{ShoutySnakeCase, CamelCase};
+use heck::{CamelCase, ShoutySnakeCase};
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use syn::{parse_macro_input, AngleBracketedGenericArguments, PathArguments, Type};
@@ -71,7 +71,8 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
         let field_name = field_ident.to_string();
         let field_name = field_name.replace("r#", "");
 
-        let field_type_ident = syn::Ident::new(&field_name.to_camel_case(), proc_macro2::Span::call_site());
+        let field_type_ident =
+            syn::Ident::new(&field_name.to_camel_case(), proc_macro2::Span::call_site());
 
         let field_index = field.index;
         let field_autofill = field.autofill;
@@ -237,21 +238,24 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
         }
     };
 
-    let fallthrough_to_extension = |function: &str, error: &str, args: &[&str]| -> proc_macro2::TokenStream {
-        let args = args.iter().map(|x| syn::Ident::new(x, proc_macro2::Span::call_site())).collect::<Vec<_>>();
-        let field = syn::Ident::new(function, proc_macro2::Span::call_site());
+    let fallthrough_to_extension =
+        |function: &str, error: &str, args: &[&str]| -> proc_macro2::TokenStream {
+            let args = args
+                .iter()
+                .map(|x| syn::Ident::new(x, proc_macro2::Span::call_site()))
+                .collect::<Vec<_>>();
+            let field = syn::Ident::new(function, proc_macro2::Span::call_site());
 
-        if let Some(extension) = &extension_field_ident {
-            quote::quote! {
-                field => self.#extension.#field(#(#args),*)
+            if let Some(extension) = &extension_field_ident {
+                quote::quote! {
+                    field => self.#extension.#field(#(#args),*)
+                }
+            } else {
+                quote::quote! {
+                    _ => panic!(#error, field)
+                }
             }
-        } else {
-            quote::quote! {
-                _ => panic!(#error, field)
-            }
-        }
-    };
-
+        };
 
     // let create_map_field = if let Some(extension) = &extension_field_ident {
     //     quote::quote! {
@@ -264,15 +268,28 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
     // };
 
     let get_map_keys = fallthrough_to_extension("get_map_keys", "No map on field {}", &["field"]);
-    let create_map_field = fallthrough_to_extension("create_map_field", "No map on field {}", &["field", "key"]);
-    let get_map_field_ref = fallthrough_to_extension("get_map_field_ref", "No map on field {}", &["field", "key"]);
-    let get_map_field_ref_mut = fallthrough_to_extension("get_map_field_ref_mut", "No map on field {}", &["field", "key"]);
+    let create_map_field =
+        fallthrough_to_extension("create_map_field", "No map on field {}", &["field", "key"]);
+    let get_map_field_ref =
+        fallthrough_to_extension("get_map_field_ref", "No map on field {}", &["field", "key"]);
+    let get_map_field_ref_mut = fallthrough_to_extension(
+        "get_map_field_ref_mut",
+        "No map on field {}",
+        &["field", "key"],
+    );
 
-    let get_map_field = fallthrough_to_extension("get_map_field", "No map on field {}", &["field", "key"]);
-    let get_map_field_mut = fallthrough_to_extension("get_map_field_mut", "No map on field {}", &["field", "key"]);
+    let get_map_field =
+        fallthrough_to_extension("get_map_field", "No map on field {}", &["field", "key"]);
+    let get_map_field_mut =
+        fallthrough_to_extension("get_map_field_mut", "No map on field {}", &["field", "key"]);
 
-    let swap_map_field = fallthrough_to_extension("swap_map_field", "No map on field {}", &["field", "lhs", "rhs"]);
-    let remove_map_field = fallthrough_to_extension("remove_map_field", "No map on field {}", &["field", "key"]);
+    let swap_map_field = fallthrough_to_extension(
+        "swap_map_field",
+        "No map on field {}",
+        &["field", "lhs", "rhs"],
+    );
+    let remove_map_field =
+        fallthrough_to_extension("remove_map_field", "No map on field {}", &["field", "key"]);
 
     let create_map_field_ref = if let Some(extension) = &extension_field_ident {
         quote::quote! {
@@ -285,15 +302,48 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
     };
 
     let get_list_len = fallthrough_to_extension("get_list_len", "No list on field {}", &["field"]);
-    let resize_list = fallthrough_to_extension("resize_list_field", "No list on field {}", &["field", "new_len"]);
-    let get_list_field_ref = fallthrough_to_extension("get_list_field_ref", "No list on field {}", &["field", "index"]);
-    let get_list_field_ref_mut = fallthrough_to_extension("get_list_field_ref_mut", "No list on field {}", &["field", "index"]);
-    let insert_list_field_ref = fallthrough_to_extension("insert_list_field_ref", "No list on field {}", &["field", "index"]);
-    let get_list_field = fallthrough_to_extension("get_list_field", "No list on field {}", &["field", "index"]);
-    let get_list_field_mut = fallthrough_to_extension("get_list_field_mut", "No list on field {}", &["field", "index"]);
-    let insert_list_field = fallthrough_to_extension("insert_list_field", "No list on field {}", &["field", "index"]);
-    let remove_list_field = fallthrough_to_extension("remove_list_field", "No list on field {}", &["field", "index"]);
-    let swap_list_field = fallthrough_to_extension("swap_list_field", "No list on field {}", &["field", "lhs", "rhs"]);
+    let resize_list = fallthrough_to_extension(
+        "resize_list_field",
+        "No list on field {}",
+        &["field", "new_len"],
+    );
+    let get_list_field_ref = fallthrough_to_extension(
+        "get_list_field_ref",
+        "No list on field {}",
+        &["field", "index"],
+    );
+    let get_list_field_ref_mut = fallthrough_to_extension(
+        "get_list_field_ref_mut",
+        "No list on field {}",
+        &["field", "index"],
+    );
+    let insert_list_field_ref = fallthrough_to_extension(
+        "insert_list_field_ref",
+        "No list on field {}",
+        &["field", "index"],
+    );
+    let get_list_field =
+        fallthrough_to_extension("get_list_field", "No list on field {}", &["field", "index"]);
+    let get_list_field_mut = fallthrough_to_extension(
+        "get_list_field_mut",
+        "No list on field {}",
+        &["field", "index"],
+    );
+    let insert_list_field = fallthrough_to_extension(
+        "insert_list_field",
+        "No list on field {}",
+        &["field", "index"],
+    );
+    let remove_list_field = fallthrough_to_extension(
+        "remove_list_field",
+        "No list on field {}",
+        &["field", "index"],
+    );
+    let swap_list_field = fallthrough_to_extension(
+        "swap_list_field",
+        "No list on field {}",
+        &["field", "lhs", "rhs"],
+    );
 
     let fields_enum = if has_fields {
         quote::quote! {
@@ -482,7 +532,7 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                     #get_list_len
                 }
             }
-            
+
             fn resize_list_field(&mut self, field: usize, new_len: usize) {
                 match field {
                     #(#list_indexes => self.#list_fields.resize_with(new_len, || { Default::default() }),)*
@@ -672,7 +722,7 @@ impl LocalType {
 
         let child =
             if let PathArguments::AngleBracketed(AngleBracketedGenericArguments { args, .. }) =
-            &first.arguments
+                &first.arguments
             {
                 args.iter()
                     .map(|x| match x {
