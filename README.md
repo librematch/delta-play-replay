@@ -48,7 +48,7 @@ tooling around it.
     there be a one-fits-all format where the game is a property or should each
     game have their own standalone formats?
 
-## Non-goals
+### Non-goals
 
 - reimplement a desktop tool like CaptureAge
 
@@ -58,6 +58,13 @@ tooling around it.
   - exception: if the franchise would convert into the format server-side and
     stream it to CaptureAge directly to be able to spectate games without having
     the game engine running
+
+## Building
+
+### Prerequisites
+
+- [Rust](https://www.rust-lang.org/tools/install)
+- [protobuf](https://github.com/google/protobuf) for `protoc` compiler (e.g. `scoop install protobuf`)
 
 ## License
 

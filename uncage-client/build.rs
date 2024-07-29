@@ -7,7 +7,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .compile_with_config(
             {
                 let mut conf = Config::new();
-                conf.bytes(&["."]);
+                conf.bytes(["."]);
                 conf
             },
             &["proto/cade_api.proto"],

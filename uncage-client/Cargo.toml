@@ -2,7 +2,7 @@
 name = "uncage-client"
 version = "0.1.0"
 authors = ["eater <=@eater.me>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 bytes = "1.0.1"

@@ -2,7 +2,7 @@
 name = "uncage-patcher"
 version = "0.1.0"
 authors = ["eater <=@eater.me>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 anyhow = "1.0.40"
