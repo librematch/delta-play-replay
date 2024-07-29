@@ -1,8 +1,10 @@
 [package]
 name = "playback"
 version = "0.1.0"
-authors = ["eater <=@eater.me>"]
-edition = "2021"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
 
 [[example]]
 name = "playback_blob"

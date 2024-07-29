@@ -1,8 +1,17 @@
 [package]
 name = "uncage"
 version = "0.1.0"
-authors = ["eater <=@eater.me>"]
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+[workspace.package]
+authors = ["eater <=@eater.me>", "the libre:match team <info@librematch.org>"]
+categories = ["command-line-utilities"]
 edition = "2021"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/librematch/delta-play-replay"
 
 [workspace]
 members = [
