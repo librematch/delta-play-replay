@@ -60,6 +60,9 @@ jobs:
         if: ${{ matrix.toolchain == 'stable' }}
         run: cargo clippy --all-targets -- -D warnings
 
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+  
       - name: Run clippy on beta but do not fail on us, we are just testing
         if: ${{ matrix.toolchain == 'beta' }}
         run: cargo clippy --all-targets
@@ -82,6 +85,9 @@ jobs:
           
       - uses: Swatinem/rust-cache@v2
       
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+
       - name: Run clippy
         run: cargo clippy --all-targets
 
@@ -113,6 +119,9 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
 
       - name: Install Rust ${{ matrix.toolchain }}
         uses: dtolnay/rust-toolchain@v1
