@@ -66,6 +66,10 @@ tooling around it.
 - [Rust](https://www.rust-lang.org/tools/install)
 - [protobuf](https://github.com/google/protobuf) for `protoc` compiler (e.g.
   `scoop install protobuf`)
+- [perl](https://www.perl.org/get.html) for `openssl-sys` (e.g.
+  `scoop install perl`)
+- [openssl](https://www.openssl.org/source/) for `openssl-sys` (e.g.
+  `scoop install openssl`)
 
 ## License
 

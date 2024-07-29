@@ -4,24 +4,21 @@ version = "0.1.0"
 authors = ["eater <=@eater.me>"]
 edition = "2021"
 
-[dependencies]
-uncage-client = { path = "uncage-client" }
-uncage-model = { path = "uncage-model" }
-uncage-patcher = { path = "uncage-patcher" }
-
-[dev-dependencies]
-cairo-rs = { version = "0.9.1", features = ["svg", "png", "v1_16"] }
-nalgebra = "*"
-nalgebra-glm = "0.12.0"
-pastel = "0.8.0"
-
 [workspace]
 members = [
   "uncage-client",
   "uncage-model",
   "uncage-model-proc-macro",
-  "uncage-patcher",
 ]
+
+[workspace.dependencies]
+uncage-client = { path = "uncage-client" }
+uncage-model = { path = "uncage-model" }
+uncage-model-proc-macro = { path = "uncage-model-proc-macro" }
+
+[dependencies]
+uncage-client = { workspace = true }
+uncage-model = { workspace = true }
 
 # compile dependencies with optimizations in dev mode
 # see: https://doc.rust-lang.org/stable/cargo/reference/profiles.html#overrides

@@ -192,7 +192,7 @@ jobs:
     # cargo-hack checks combinations of feature flags to ensure that features are all additive
     # which is required for feature unification
     runs-on: ubuntu-latest
-    name: ubuntu / stable / features
+    name: Powerset on ubuntu / stable / features
     steps:
       - uses: actions/checkout@v4
         with:
