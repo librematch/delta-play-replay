@@ -542,13 +542,11 @@ impl<T> ItemStore<T> {
     pub fn remove(&mut self, index: usize) -> Option<T> {
         if index >= self.items.len() {
             None
+        } else if let Some(x) = self.items[index].take() {
+            self.free.push_back(index);
+            Some(x)
         } else {
-            if let Some(x) = self.items[index].take() {
-                self.free.push_back(index);
-                Some(x)
-            } else {
-                None
-            }
+            None
         }
     }
 
