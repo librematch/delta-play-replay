@@ -1,11 +1,3 @@
-[package]
-name = "uncage"
-version = "0.1.0"
-authors = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
-repository = { workspace = true }
-
 [workspace.package]
 authors = ["eater <=@eater.me>", "the libre:match team <info@librematch.org>"]
 categories = ["command-line-utilities"]
@@ -15,21 +7,17 @@ repository = "https://github.com/librematch/delta-play-replay"
 
 [workspace]
 members = [
+  "crates/uncage-client",
+  "crates/uncage-model",
+  "crates/uncage-model-proc-macro",
   "examples/decompress",
   "examples/playback",
-  "uncage-client",
-  "uncage-model",
-  "uncage-model-proc-macro",
 ]
 
 [workspace.dependencies]
-uncage-client = { path = "uncage-client" }
-uncage-model = { path = "uncage-model" }
-uncage-model-proc-macro = { path = "uncage-model-proc-macro" }
-
-[dependencies]
-uncage-client = { workspace = true }
-uncage-model = { workspace = true }
+uncage-client = { path = "crates/uncage-client" }
+uncage-model = { path = "crates/uncage-model" }
+uncage-model-proc-macro = { path = "crates/uncage-model-proc-macro" }
 
 # compile dependencies with optimizations in dev mode
 # see: https://doc.rust-lang.org/stable/cargo/reference/profiles.html#overrides
