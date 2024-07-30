@@ -333,9 +333,15 @@ impl<R: Model, C: ModelCollection> Debug for Document<R, C> {
     }
 }
 
+impl<R: Model, C: ModelCollection> Default for Document<R, C> {
+    fn default() -> Self {
+        Self(Rc::new(UnsafeCell::new(InnerDocument::new())))
+    }
+}
+
 impl<R: Model, C: ModelCollection> Document<R, C> {
     pub fn new() -> Document<R, C> {
-        Document(Rc::new(UnsafeCell::new(InnerDocument::new())))
+        Self::default()
     }
 
     pub fn by_id(&self, id: usize) -> Option<ModelBorrow<'_, R, C>> {
