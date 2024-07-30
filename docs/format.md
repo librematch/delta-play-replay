@@ -4,7 +4,7 @@ AoE2:DE exposes a gRPC endpoint, which when watching replays is able to provide
 state delta's
 
 This delta format is stack based, and requires a pre-definition of the state
-object, ours can be found in [uncage-patcher/src/model.rs](/src/model.rs)
+object, ours can be found in [model.rs](../crates/uncage/src/model.rs)
 
 The format is a sequence of instructions, as they're called internally, which
 either modify the patcher state, or the state object itself. the instruction
