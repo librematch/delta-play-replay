@@ -21,7 +21,7 @@ brotli = "3.5.0"
 byteorder = "1.5.0"
 bytes = "1.6.1"
 serde_json = "1.0.121"
-tokio = { version = "1.39.2" }
+tokio = "1.39.2"
 uncage-client = { path = "crates/uncage-client" }
 uncage-model = { path = "crates/uncage-model" }
 
