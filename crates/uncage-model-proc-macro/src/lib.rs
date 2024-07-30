@@ -80,15 +80,15 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
         let field_field_type = get_field_type(&field_local_type);
         let field_value_type = match &field_local_type {
             LocalType::Map { key, .. } => {
-                let key_type = get_field_type(&key);
-                quote::quote! { ::uncage_model::ValueType::Map { key: #key_type } }
+                let key_type = get_field_type(key);
+                quote::quote! { crate::ValueType::Map { key: #key_type } }
             }
-            LocalType::Vector { .. } => quote::quote! { ::uncage_model::ValueType::List },
-            _ => quote::quote! { ::uncage_model::ValueType::Value },
+            LocalType::Vector { .. } => quote::quote! { crate::ValueType::List },
+            _ => quote::quote! { crate::ValueType::Value },
         };
 
         field_definitions.push(quote::quote! {
-            ::uncage_model::FieldDescription {
+            crate::FieldDescription {
                 value_type: #field_value_type,
                 field_type: #field_field_type,
                 index: #field_index,
@@ -353,7 +353,7 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 #(#model_fields_enum_names = #field_indexes),*
             }
 
-            impl ::uncage_model::Fields for #model_fields_enum {
+            impl crate::Fields for #model_fields_enum {
                 fn field(&self) -> usize {
                     *self as usize
                 }
@@ -392,9 +392,9 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
 
         #fields_enum
 
-        const #model_fields_const_ident: [::uncage_model::FieldDescription; #i] = [#(#field_definitions),*];
+        const #model_fields_const_ident: [crate::FieldDescription; #i] = [#(#field_definitions),*];
 
-        impl ::uncage_model::Model for #model_ident {
+        impl crate::Model for #model_ident {
             fn model_type() -> usize {
                 #model_ident::const_model_type()
             }
@@ -404,12 +404,41 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
             }
         }
 
-        impl ::uncage_model::ModelDescription for #model_ident {
+        // TODO!: Do we need to implement this?
+        impl crate::ModelExt for #model_ident {
+            fn assign<B: Buf>(&mut self, index: usize, from: &mut B) -> anyhow::Result<()> {
+                match index {
+                    #(#field_indexes => {
+                        // TODO: write to the field
+                        // self.#fields = todo!();
+
+                        Ok(())
+                    },)*
+                    _ => Err(anyhow::anyhow!("No field with index {}", index))
+                }
+            }
+
+            fn reset<B: Buf>(&mut self, index: usize) -> anyhow::Result<()> {
+                match index {
+                    #(#field_indexes => {
+                        // TODO: reset to default value?
+                        // 
+                        // self.#fields = self.#fields.default();
+
+
+                        Ok(())
+                    },)*
+                    _ => Err(anyhow::anyhow!("No field with index {}", index))
+                }
+            }
+        }
+
+        impl crate::ModelDescription for #model_ident {
             fn as_any(&self) -> &dyn ::std::any::Any {
                 self as &dyn ::std::any::Any
             }
 
-            fn get_parent(&self) -> Option<&dyn ::uncage_model::ModelDescription> {
+            fn get_parent(&self) -> Option<&dyn crate::ModelDescription> {
                 #get_parent
             }
 
@@ -421,11 +450,11 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 #model_ident::const_model_name()
             }
 
-            fn get_fields(&self) -> Vec<::uncage_model::FieldDescription> {
+            fn get_fields(&self) -> Vec<crate::FieldDescription> {
                 #model_get_fields
             }
 
-            fn get_field_description(&self, field: usize) -> Option<&'static ::uncage_model::FieldDescription> {
+            fn get_field_description(&self, field: usize) -> Option<&'static crate::FieldDescription> {
                 match field {
                     #(#field_indexes => Some(&#model_fields_const_ident[#indexes]),)*
                     #get_field_desc
@@ -453,7 +482,7 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn get_model_ref_mut(&mut self, field: usize) -> Option<&mut ::uncage_model::Ref> {
+            fn get_model_ref_mut(&mut self, field: usize) -> Option<&mut crate::Ref> {
                 match field {
                     #(#reference_indexes => Some(self.#reference_fields.as_ref_mut()),)*
                     #get_ref_val_mut
@@ -474,7 +503,7 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn create_map_field_ref(&mut self, field: usize, key: i32) -> Option<&mut ::uncage_model::Ref> {
+            fn create_map_field_ref(&mut self, field: usize, key: i32) -> Option<&mut crate::Ref> {
                 match field {
                     #(#ref_map_indexes => Some(self.#ref_map_fields.entry(key).or_insert_with(|| Default::default()).as_ref_mut()),)*
                     #create_map_field_ref
@@ -501,14 +530,14 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                     #get_map_field_ref
                 }
             }
-            fn get_map_field_ref_mut(&mut self, field: usize, key: i32) -> Option<&mut ::uncage_model::Ref> {
+            fn get_map_field_ref_mut(&mut self, field: usize, key: i32) -> Option<&mut crate::Ref> {
                 match field {
                     #(#ref_map_indexes => Some(self.#ref_map_fields.get_mut(&key)?.as_ref_mut()),)*
                     #get_map_field_ref_mut
                 }
             }
 
-            fn remove_map_field(&mut self, field: usize, key: i32) -> Option<::uncage_model::Ref> {
+            fn remove_map_field(&mut self, field: usize, key: i32) -> Option<crate::Ref> {
                 match field {
                     #(#map_indexes => #map_remove,)*
                     #remove_map_field
@@ -564,21 +593,21 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn get_list_field_ref(&self, field: usize, index: usize) -> &::uncage_model::Ref {
+            fn get_list_field_ref(&self, field: usize, index: usize) -> &crate::Ref {
                 match field {
                     #(#ref_list_indexes => self.#ref_list_fields[index].as_ref(),)*
                     #get_list_field_ref
                 }
             }
 
-            fn get_list_field_ref_mut(&mut self, field: usize, index: usize) -> &mut ::uncage_model::Ref {
+            fn get_list_field_ref_mut(&mut self, field: usize, index: usize) -> &mut crate::Ref {
                 match field {
                     #(#ref_list_indexes => self.#ref_list_fields[index].as_ref_mut(),)*
                     #get_list_field_ref_mut
                 }
             }
 
-            fn insert_list_field_ref(&mut self, field: usize, index: usize) -> &mut ::uncage_model::Ref {
+            fn insert_list_field_ref(&mut self, field: usize, index: usize) -> &mut crate::Ref {
                 match field {
                     #(#ref_list_indexes => {
                         self.#ref_list_fields.insert(index, Default::default());
@@ -588,7 +617,7 @@ pub fn derive_model(token_stream: TokenStream) -> TokenStream {
                 }
             }
 
-            fn remove_list_field(&mut self, field: usize, index: usize) -> Option<::uncage_model::Ref> {
+            fn remove_list_field(&mut self, field: usize, index: usize) -> Option<crate::Ref> {
                 match field {
                     #(#list_indexes => #list_remove,)*
                     #remove_list_field
@@ -626,7 +655,7 @@ pub fn derive_model_collection(token_stream: TokenStream) -> TokenStream {
     }
 
     let code = quote::quote! {
-        impl ::uncage_model::ModelCollection for #name {
+        impl crate::ModelCollection for #name {
             fn create_model(id: usize) -> Self {
                 #(if id == #models::const_model_type() { return #name::#names(#models::default()) })*
                 panic!("No model in model collection with model type {}", id)
@@ -637,7 +666,7 @@ pub fn derive_model_collection(token_stream: TokenStream) -> TokenStream {
                 false
             }
 
-            fn boxed(self) -> Box<dyn ::uncage_model::ModelDescription> {
+            fn boxed(self) -> Box<dyn crate::ModelDescription> {
                 match self {
                     #(#name::#names(model) => Box::new(model),)*
                 }
@@ -669,25 +698,25 @@ enum LocalType {
 
 fn get_field_type(from: &LocalType) -> proc_macro2::TokenStream {
     match from.ident().to_string().as_str() {
-        "bool" => quote::quote! { ::uncage_model::FieldType::Boolean },
-        "u8" => quote::quote! { ::uncage_model::FieldType::UInt8 },
-        "i8" => quote::quote! { ::uncage_model::FieldType::Int8 },
-        "u16" => quote::quote! { ::uncage_model::FieldType::UInt16 },
-        "i16" => quote::quote! { ::uncage_model::FieldType::Int16 },
-        "u32" => quote::quote! { ::uncage_model::FieldType::UInt32 },
-        "i32" => quote::quote! { ::uncage_model::FieldType::Int32 },
-        "u64" => quote::quote! { ::uncage_model::FieldType::UInt64 },
-        "i64" => quote::quote! { ::uncage_model::FieldType::Int64 },
-        "u128" => quote::quote! { ::uncage_model::FieldType::UInt128 },
-        "i128" => quote::quote! { ::uncage_model::FieldType::Int128 },
-        "f32" => quote::quote! { ::uncage_model::FieldType::Float },
-        "f64" => quote::quote! { ::uncage_model::FieldType::Double },
-        "String" => quote::quote! { ::uncage_model::FieldType::String },
-        "Ref" => quote::quote! { ::uncage_model::FieldType::Model },
+        "bool" => quote::quote! { crate::FieldType::Boolean },
+        "u8" => quote::quote! { crate::FieldType::UInt8 },
+        "i8" => quote::quote! { crate::FieldType::Int8 },
+        "u16" => quote::quote! { crate::FieldType::UInt16 },
+        "i16" => quote::quote! { crate::FieldType::Int16 },
+        "u32" => quote::quote! { crate::FieldType::UInt32 },
+        "i32" => quote::quote! { crate::FieldType::Int32 },
+        "u64" => quote::quote! { crate::FieldType::UInt64 },
+        "i64" => quote::quote! { crate::FieldType::Int64 },
+        "u128" => quote::quote! { crate::FieldType::UInt128 },
+        "i128" => quote::quote! { crate::FieldType::Int128 },
+        "f32" => quote::quote! { crate::FieldType::Float },
+        "f64" => quote::quote! { crate::FieldType::Double },
+        "String" => quote::quote! { crate::FieldType::String },
+        "Ref" => quote::quote! { crate::FieldType::Model },
         "BTreeMap" | "HashMap" | "Vec" => get_field_type(from.value()),
         "ModelRef" | "ModelVec" | "ModelHashMap" | "ModelBTreeMap" => {
             let value_type = from.value().ident();
-            quote::quote! { ::uncage_model::FieldType::TypeModel(#value_type::const_model_type()) }
+            quote::quote! { crate::FieldType::TypeModel(#value_type::const_model_type()) }
         }
         _ => panic!("Don't have a field type for {}", from.ident()),
     }
