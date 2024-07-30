@@ -7,12 +7,12 @@ license = { workspace = true }
 repository = { workspace = true }
 
 [dependencies]
-bytes = "1.6.1"
-hyper = "1.4.1"
-hyper-openssl = "0.10.2"
-prost = "0.13.1"
-tokio = { version = "1.39.2", features = ["full"] }
-tonic = "0.12.1"
+bytes = { workspace = true }
+hyper = "0.14.30"
+hyper-openssl = "0.9.2"
+prost = "0.7.0"
+tokio = { workspace = true, features = ["full"] }
+tonic = "0.4.3"
 tonic-openssl = "0.2.0"
 tower = "0.4.13"
 xz2 = "0.1.7"

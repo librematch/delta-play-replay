@@ -3,7 +3,7 @@ use anyhow::Context;
 use bytes::Buf;
 use std::any::Any;
 use std::fmt::Debug;
-pub use uncage_model_proc_macro::Model as ModelProc;
+pub use uncage_model_proc_macro::Model;
 
 pub trait ModelCollection: Debug {
     fn create_model(id: usize) -> Self;
@@ -274,7 +274,6 @@ pub trait Model: Debug + Default + ModelDescription + Any {
 
 #[cfg(test)]
 mod tests {
-    use super::ModelProc;
     use crate::{
         FieldDescription, FieldType, Model, ModelBTreeMap, ModelDescription, ModelExt, ModelRef,
         ModelVec, Ref, ValueType,
@@ -285,7 +284,7 @@ mod tests {
 
     #[test]
     pub fn test_works() {
-        #[derive(Debug, Default, ModelProc)]
+        #[derive(Debug, Default, Model)]
         #[uncage(type = 4)]
         struct Game {
             #[uncage(index = 0)]

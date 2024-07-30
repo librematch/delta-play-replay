@@ -10,9 +10,9 @@ repository = { workspace = true }
 name = "decompress_recording"
 
 [dev-dependencies]
-anyhow = "1.0.86"
-brotli = "3.5.0"
-byteorder = "1.5.0"
-bytes = "1.6.1"
-serde_json = "1.0.121"
+anyhow = { workspace = true }
+brotli = { workspace = true }
+byteorder = { workspace = true }
+bytes = { workspace = true }
+serde_json = { workspace = true }
 uncage-model = { workspace = true }

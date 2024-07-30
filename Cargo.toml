@@ -13,11 +13,17 @@ members = [
   "examples/decompress",
   "examples/playback",
 ]
+resolver = "2"
 
 [workspace.dependencies]
+anyhow = "1.0.86"
+brotli = "3.5.0"
+byteorder = "1.5.0"
+bytes = "1.6.1"
+serde_json = "1.0.121"
+tokio = { version = "1.39.2" }
 uncage-client = { path = "crates/uncage-client" }
 uncage-model = { path = "crates/uncage-model" }
-uncage-model-proc-macro = { path = "crates/uncage-model-proc-macro" }
 
 # compile dependencies with optimizations in dev mode
 # see: https://doc.rust-lang.org/stable/cargo/reference/profiles.html#overrides
