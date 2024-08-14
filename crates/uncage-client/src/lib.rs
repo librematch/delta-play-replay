@@ -7,14 +7,15 @@ use openssl::pkey::PKey;
 use openssl::ssl::{SslConnector, SslMethod};
 use openssl::x509::X509;
 use std::fs::File;
-use tonic_openssl::ALPN_H2_WIRE;
 
 pub use prost::{self, Message};
 use std::io::Write;
 
 pub mod pb {
-    include!(concat!(env!("OUT_DIR"), "/cade_api.rpc.rs"));
+    tonic::include_proto!("cade_api.rpc");
 }
+
+pub const ALPN_H2_WIRE: &[u8] = b"\x02h2";
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
