@@ -63,6 +63,8 @@ tooling around it.
 
 ### Prerequisites
 
+- [Build Tools for Visual Studio](https://visualstudio.microsoft.com/downloads)
+  for `msvc`, `clang`, `cmake`, etc.
 - [Rust](https://www.rust-lang.org/tools/install)
 - [protobuf](https://github.com/google/protobuf) for `protoc` compiler (e.g.
   `scoop install protobuf`)
